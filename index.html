@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus & Mindful Presence</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@300;400&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        .serif-font {
+            font-family: 'Cinzel', serif;
+        }
+
+        .mono-font {
+            font-family: 'Space Grotesk', monospace;
+        }
+
+        /* Glassmorphism card effects */
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-button {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            transition: all 0.3s ease;
+        }
+
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Subtle glowing aura */
+        .aura-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.8;
+            transition: opacity 1.5s ease;
+        }
+
+        /* Breath Ring Animation */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(0.95); opacity: 0.3; }
+        }
+
+        .breath-ring {
+            animation: pulse-ring 8s infinite ease-in-out;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between items-center relative text-slate-100 selection:bg-indigo-500 selection:text-white">
+
+    <!-- Canvas background for smooth generative minimalist art -->
+    <canvas id="artCanvas" class="fixed top-0 left-0 w-full h-full z-0 pointer-events-none"></canvas>
+    <div id="aura" class="aura-bg"></div>
+
+    <!-- Header Navigation -->
+    <header class="w-full max-w-5xl px-6 py-6 flex justify-between items-center z-10">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-teal-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <i class="fa-solid fa-atom text-white text-xs"></i>
+            </div>
+            <span class="text-xs uppercase tracking-widest font-semibold text-slate-400">Focus Realm</span>
+        </div>
+        
+        <div class="flex items-center space-x-3">
+            <!-- Shortcut setup guide toggle -->
+            <button onclick="toggleModal('shortcutModal')" class="glass-button px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center space-x-2 text-slate-300 hover:text-white">
+                <i class="fa-brands fa-apple text-sm"></i>
+                <span>Siri Setup</span>
+            </button>
+
+            <!-- Sound toggle -->
+            <button id="audioBtn" onclick="toggleAudio()" class="glass-button w-9 h-9 rounded-full flex items-center justify-center text-slate-300 hover:text-white" title="Ambient Focus Noise">
+                <i id="audioIcon" class="fa-solid fa-volume-xmark text-sm"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="w-full max-w-3xl px-6 py-8 flex flex-col items-center justify-center z-10 text-center my-auto">
+        
+        <!-- Subtle Animated Breathing Visualizer -->
+        <div class="relative mb-6 flex items-center justify-center">
+            <div class="w-20 h-20 rounded-full border border-indigo-400/30 breath-ring absolute"></div>
+            <div class="w-14 h-14 rounded-full border border-teal-400/40 breath-ring absolute" style="animation-delay: -4s;"></div>
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500/20 to-teal-400/20 backdrop-blur-md flex items-center justify-center border border-white/20">
+                <div class="w-2.5 h-2.5 rounded-full bg-teal-300 shadow-lg shadow-teal-400/50"></div>
+            </div>
+        </div>
+
+        <!-- Quote Container -->
+        <div class="space-y-4 max-w-2xl">
+            <h1 id="quoteText" class="serif-font text-xl sm:text-2xl md:text-3xl leading-relaxed text-slate-100 font-light tracking-wide transition-opacity duration-700 opacity-100">
+                "Concentrate all your thoughts upon the work in hand. The sun's rays do not burn until brought to a focus."
+            </h1>
+            <p id="quoteAuthor" class="text-xs uppercase tracking-widest text-indigo-300 font-mono font-medium transition-opacity duration-700 opacity-100">
+                — Alexander Graham Bell
+            </p>
+        </div>
+
+        <!-- Curated Focus Art Piece Display -->
+        <div class="mt-6 w-full max-w-md relative group">
+            <div class="glass-panel p-2 rounded-2xl border border-white/10 shadow-2xl overflow-hidden transition-all duration-700">
+                <img id="artImage" 
+                     src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80" 
+                     alt="Focus Visual Art" 
+                     class="w-full h-48 sm:h-64 object-cover rounded-xl transition-opacity duration-700 opacity-100 shadow-inner"
+                     onerror="this.src='https://placehold.co/800x500/1e293b/94a3b8?text=Serene+Focus+Art'" />
+            </div>
+            <div id="artCaption" class="mt-2 text-[11px] text-slate-400 font-mono tracking-wider opacity-80 transition-opacity duration-700">
+                Art Piece: Serene Horizon
+            </div>
+        </div>
+
+        <!-- Action Controls -->
+        <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <!-- New Quote Button -->
+            <button onclick="nextQuote()" class="glass-button px-5 py-2.5 rounded-full text-xs font-semibold tracking-wider uppercase text-slate-200 hover:text-white flex items-center space-x-2">
+                <i class="fa-solid fa-rotate-right text-xs"></i>
+                <span>Refresh Focus</span>
+            </button>
+
+            <!-- Toggle Art Style -->
+            <button onclick="cycleArt()" class="glass-button px-5 py-2.5 rounded-full text-xs font-semibold tracking-wider uppercase text-slate-200 hover:text-white flex items-center space-x-2">
+                <i class="fa-solid fa-palette text-xs"></i>
+                <span id="artStyleLabel">Art: Nebular</span>
+            </button>
+
+            <!-- Quick Timer Button -->
+            <button onclick="startQuickTimer()" id="timerBtn" class="glass-button px-5 py-2.5 rounded-full text-xs font-semibold tracking-wider uppercase text-slate-200 hover:text-white flex items-center space-x-2">
+                <i class="fa-solid fa-hourglass-half text-xs"></i>
+                <span id="timerLabel">25m Sprint</span>
+            </button>
+        </div>
+
+        <!-- Timer Display (Hidden by default) -->
+        <div id="timerDisplay" class="hidden mt-6 glass-panel px-6 py-3 rounded-2xl border border-indigo-500/30">
+            <span id="timeRemaining" class="mono-font text-2xl font-bold tracking-widest text-teal-300">25:00</span>
+            <button onclick="cancelTimer()" class="ml-4 text-xs text-slate-400 hover:text-red-400">
+                <i class="fa-solid fa-xmark"></i> Stop
+            </button>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-5xl px-6 py-6 flex flex-col sm:flex-row justify-between items-center text-slate-500 text-xs z-10 border-t border-slate-800/60 gap-3">
+        <div>
+            <span>Designed for Deep Work & Minimal Distraction</span>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button onclick="copyCurrentURL()" class="hover:text-slate-300 transition-colors flex items-center space-x-1">
+                <i class="fa-regular fa-copy"></i>
+                <span>Copy URL for Siri</span>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Siri Shortcut Instructions Modal -->
+    <div id="shortcutModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md hidden transition-opacity duration-300">
+        <div class="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 space-y-6 relative border border-white/10 shadow-2xl">
+            
+            <!-- Close Button -->
+            <button onclick="toggleModal('shortcutModal')" class="absolute top-5 right-5 text-slate-400 hover:text-white w-8 h-8 rounded-full flex items-center justify-center glass-button">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg">
+                    <i class="fa-brands fa-apple text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-white">Setup Siri Shortcut</h3>
+                    <p class="text-xs text-slate-400">Trigger focus in 1 step</p>
+                </div>
+            </div>
+
+            <div class="space-y-4 text-xs text-slate-300 leading-relaxed">
+                <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800 space-y-2">
+                    <p class="font-semibold text-indigo-300 uppercase tracking-wider text-[10px]">Step 1: Copy Page Link</p>
+                    <div class="flex items-center justify-between bg-black/40 px-3 py-2 rounded border border-white/5">
+                        <span id="modalUrlText" class="truncate font-mono text-[11px] text-slate-400">https://...</span>
+                        <button onclick="copyCurrentURL()" class="ml-2 text-indigo-400 hover:text-indigo-300 text-xs font-medium">Copy</button>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <p class="font-semibold text-indigo-300 uppercase tracking-wider text-[10px]">Step 2: Create Shortcut</p>
+                    <ol class="list-decimal list-inside space-y-1.5 text-slate-300">
+                        <li>Open the <strong>Shortcuts</strong> app on iOS / macOS.</li>
+                        <li>Tap <strong>+</strong> to create a new shortcut. Name it <em>"Deep Focus"</em>.</li>
+                        <li>Add action: <strong>"Show Web Page"</strong> (Safari) or <strong>"Open URL"</strong>.</li>
+                        <li>Paste this URL into the URL field.</li>
+                        <li><em>(Optional)</em> Add an action before it: <strong>"Set Focus"</strong> -> <em>Turn Do Not Disturb ON</em>.</li>
+                    </ol>
+                </div>
+
+                <div class="bg-indigo-950/40 border border-indigo-500/20 p-3 rounded-xl">
+                    <p class="text-indigo-200">
+                        <i class="fa-solid fa-lightbulb text-indigo-400 mr-1"></i>
+                        Say <strong>"Hey Siri, Deep Focus"</strong> or bind it to your iPhone's <strong>Action Button</strong> or Back Tap feature!
+                    </p>
+                </div>
+            </div>
+
+            <button onclick="toggleModal('shortcutModal')" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition-colors shadow-lg shadow-indigo-600/30">
+                Got it
+            </button>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 glass-panel px-4 py-2.5 rounded-full text-xs font-medium text-white flex items-center space-x-2 shadow-xl opacity-0 pointer-events-none transition-all duration-300 z-50 border border-teal-500/30">
+        <i class="fa-solid fa-check text-teal-400"></i>
+        <span id="toastMsg">URL copied to clipboard!</span>
+    </div>
+
+    <script>
+        /* ==========================================================================
+           CURATED FOCUS & DEEP WORK QUOTES WITH ARTWORK MATCHES
+           ========================================================================== */
+        const quotes = [
+            {
+                text: "Concentrate all your thoughts upon the work in hand. The sun's rays do not burn until brought to a focus.",
+                author: "Alexander Graham Bell",
+                artUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80",
+                artTitle: "Serene Horizon"
+            },
+            {
+                text: "Deep work is the ability to focus without distraction on a cognitively demanding task.",
+                author: "Cal Newport",
+                artUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80",
+                artTitle: "Luminous Minimalist Void"
+            },
+            {
+                text: "It is not that I have so much wisdom, but only that I stick to the problems longer.",
+                author: "Albert Einstein",
+                artUrl: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1000&q=80",
+                artTitle: "Fluid Waves of Thought"
+            },
+            {
+                text: "The successful warrior is the average man, with laser-like focus.",
+                author: "Bruce Lee",
+                artUrl: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=1000&q=80",
+                artTitle: "Atmospheric Twilight"
+            },
+            {
+                text: "You will never reach your destination if you stop and throw stones at every dog that barks.",
+                author: "Winston Churchill",
+                artUrl: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=1000&q=80",
+                artTitle: "Prismatic Clarity"
+            },
+            {
+                text: "Focus is a matter of deciding what things you're not going to do.",
+                author: "John Carmack",
+                artUrl: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=1000&q=80",
+                artTitle: "Monochrome Geometry"
+            },
+            {
+                text: "Where your attention goes, your time goes, and your life follows.",
+                author: "Minimalist Proverb",
+                artUrl: "https://images.unsplash.com/photo-1518837695005-2083093ee35b?auto=format&fit=crop&w=1000&q=80",
+                artTitle: "Quiet Ocean Calm"
+            },
+            {
+                text: "Do one thing at a time, and do it better than anyone else.",
+                author: "Marcus Aurelius",
+                artUrl: "https://images.unsplash.com/photo-1499209974431-9dac3ada00d7?auto=format&fit=crop&w=1000&q=80",
+                artTitle: "Solitary Dawn"
+            }
+        ];
+
+        let currentQuoteIdx = 0;
+
+        function nextQuote() {
+            const quoteText = document.getElementById('quoteText');
+            const quoteAuthor = document.getElementById('quoteAuthor');
+            const artImage = document.getElementById('artImage');
+            const artCaption = document.getElementById('artCaption');
+
+            // Fade out current content
+            quoteText.classList.add('opacity-0');
+            quoteAuthor.classList.add('opacity-0');
+            artImage.classList.add('opacity-0');
+            artCaption.classList.add('opacity-0');
+
+            setTimeout(() => {
+                currentQuoteIdx = (currentQuoteIdx + 1) % quotes.length;
+                const current = quotes[currentQuoteIdx];
+
+                quoteText.textContent = `"${current.text}"`;
+                quoteAuthor.textContent = `— ${current.author}`;
+                artImage.src = current.artUrl;
+                artCaption.textContent = `Art Piece: ${current.artTitle}`;
+
+                // Fade back in
+                quoteText.classList.remove('opacity-0');
+                quoteAuthor.classList.remove('opacity-0');
+                artImage.classList.remove('opacity-0');
+                artCaption.classList.remove('opacity-0');
+            }, 350);
+        }
+
+        /* ==========================================================================
+           GENERATIVE BACKGROUND ART (Canvas Procedural Animations)
+           ========================================================================== */
+        const canvas = document.getElementById('artCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+
+        const styles = ['Nebular', 'Flow Fields', 'Constellation'];
+        let currentStyleIdx = 0;
+
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Particles setup
+        const particleCount = 60;
+        const particles = [];
+        for (let i = 0; i < particleCount; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
+                radius: Math.random() * 2 + 1,
+                alpha: Math.random() * 0.5 + 0.2
+            });
+        }
+
+        let time = 0;
+        function renderArt() {
+            time += 0.005;
+            ctx.clearRect(0, 0, width, height);
+
+            if (styles[currentStyleIdx] === 'Nebular') {
+                // Soft floating aurora blobs
+                for (let i = 0; i < 3; i++) {
+                    const cx = width * (0.3 + 0.4 * Math.sin(time + i * 2));
+                    const cy = height * (0.4 + 0.3 * Math.cos(time * 0.8 + i));
+                    const radius = Math.min(width, height) * 0.4;
+
+                    const gradient = ctx.createRadialGradient(cx, cy, 10, cx, cy, radius);
+                    if (i === 0) {
+                        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.15)'); // Indigo
+                        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                    } else if (i === 1) {
+                        gradient.addColorStop(0, 'rgba(45, 212, 191, 0.12)'); // Teal
+                        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                    } else {
+                        gradient.addColorStop(0, 'rgba(168, 85, 247, 0.1)'); // Purple
+                        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                    }
+
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            } else if (styles[currentStyleIdx] === 'Flow Fields') {
+                // Calm geometric drift
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+                ctx.lineWidth = 1;
+                const step = 40;
+                for (let x = 0; x < width; x += step) {
+                    for (let y = 0; y < height; y += step) {
+                        const angle = Math.sin(x * 0.002 + time) + Math.cos(y * 0.002 + time);
+                        ctx.beginPath();
+                        ctx.moveTo(x, y);
+                        ctx.lineTo(x + Math.cos(angle) * 20, y + Math.sin(angle) * 20);
+                        ctx.stroke();
+                    }
+                }
+            } else if (styles[currentStyleIdx] === 'Constellation') {
+                // Subtle moving network
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                ctx.strokeStyle = 'rgba(99, 102, 241, 0.08)';
+
+                particles.forEach((p, idx) => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0 || p.x > width) p.vx *= -1;
+                    if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Connect nearby particles
+                    for (let j = idx + 1; j < particles.length; j++) {
+                        const p2 = particles[j];
+                        const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                        if (dist < 130) {
+                            ctx.beginPath();
+                            ctx.moveTo(p.x, p.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            ctx.stroke();
+                        }
+                    }
+                });
+            }
+
+            requestAnimationFrame(renderArt);
+        }
+
+        function cycleArt() {
+            currentStyleIdx = (currentStyleIdx + 1) % styles.length;
+            document.getElementById('artStyleLabel').textContent = `Art: ${styles[currentStyleIdx]}`;
+        }
+
+        window.onload = function() {
+            renderArt();
+            document.getElementById('modalUrlText').textContent = window.location.href;
+        };
+
+        /* ==========================================================================
+           AMBIENT AUDIO SYNTHESIZER (Web Audio API - Binaural Soft Pink Noise)
+           ========================================================================== */
+        let audioCtx = null;
+        let isPlayingAudio = false;
+        let noiseNode = null;
+
+        function toggleAudio() {
+            const btnIcon = document.getElementById('audioIcon');
+
+            if (!isPlayingAudio) {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+
+                // Generate calming pink noise
+                const bufferSize = audioCtx.sampleRate * 2;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+
+                for (let i = 0; i < bufferSize; i++) {
+                    let white = Math.random() * 2 - 1;
+                    b0 = 0.99886 * b0 + white * 0.0555179;
+                    b1 = 0.99332 * b1 + white * 0.0750759;
+                    b2 = 0.96900 * b2 + white * 0.1538520;
+                    b3 = 0.86650 * b3 + white * 0.3104856;
+                    b4 = 0.55000 * b4 + white * 0.5329522;
+                    b5 = -0.7616 * b5 - white * 0.0168980;
+                    data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+                    data[i] *= 0.03; // Gentle low volume
+                    b6 = white * 0.115926;
+                }
+
+                noiseNode = audioCtx.createBufferSource();
+                noiseNode.buffer = buffer;
+                noiseNode.loop = true;
+
+                // Low-pass filter for extreme softness
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 400;
+
+                noiseNode.connect(filter);
+                filter.connect(audioCtx.destination);
+                noiseNode.start();
+
+                isPlayingAudio = true;
+                btnIcon.className = "fa-solid fa-volume-high text-teal-300";
+                showToast("Ambient focus sound active");
+            } else {
+                if (noiseNode) {
+                    noiseNode.stop();
+                    noiseNode.disconnect();
+                }
+                isPlayingAudio = false;
+                btnIcon.className = "fa-solid fa-volume-xmark text-slate-300";
+                showToast("Sound muted");
+            }
+        }
+
+        /* ==========================================================================
+           FOCUS SPRINT TIMER
+           ========================================================================== */
+        let timerInterval = null;
+        let timerSeconds = 25 * 60;
+
+        function startQuickTimer() {
+            const timerDisplay = document.getElementById('timerDisplay');
+            const timeRemaining = document.getElementById('timeRemaining');
+            
+            clearInterval(timerInterval);
+            timerSeconds = 25 * 60;
+            timerDisplay.classList.remove('hidden');
+
+            updateTimerText();
+
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    timeRemaining.textContent = "DONE";
+                    showToast("Sprint finished! Take a breath.");
+                } else {
+                    updateTimerText();
+                }
+            }, 1000);
+
+            showToast("25-minute focus session started");
+        }
+
+        function updateTimerText() {
+            const timeRemaining = document.getElementById('timeRemaining');
+            const mins = Math.floor(timerSeconds / 60);
+            const secs = timerSeconds % 60;
+            timeRemaining.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function cancelTimer() {
+            clearInterval(timerInterval);
+            document.getElementById('timerDisplay').classList.add('hidden');
+            showToast("Timer stopped");
+        }
+
+        /* ==========================================================================
+           MODAL & UTILITY FUNCTIONS
+           ========================================================================== */
+        function toggleModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function copyCurrentURL() {
+            const dummy = document.createElement('input');
+            document.body.appendChild(dummy);
+            dummy.value = window.location.href;
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+            showToast("URL copied to clipboard!");
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.textContent = msg;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
